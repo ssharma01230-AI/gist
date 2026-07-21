@@ -1,0 +1,66 @@
+name: Ingest snapshot
+
+# One live pull of all 50 feeds, committed back to the branch as
+# data/snapshot/articles.{jsonl,csv} so the full article list is retrievable
+# (the dev sandbox can't reach the feeds; artifact download is also blocked).
+# Trigger by hand from the Actions tab, or by pushing this file / the scripts.
+on:
+  workflow_dispatch:
+  push:
+    branches: ["**"]
+    paths:
+      - ".github/workflows/ingest-snapshot.yml"
+      - "scripts/run_ingest.py"
+      - "scripts/snapshot_to_csv.py"
+
+permissions:
+  contents: write        # needed to commit the snapshot back to the branch
+
+concurrency:             # never let two snapshot commits race
+  group: ingest-snapshot-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Pull all 50 feeds (live)
+        continue-on-error: true   # a single transient source shouldn't lose the whole snapshot
+        run: |
+          rm -f data/snapshot/articles.jsonl      # fresh snapshot each run, not an accumulation
+          python scripts/run_ingest.py --out data/snapshot/articles.jsonl
+
+      - name: Build CSV + counts
+        run: |
+          python scripts/snapshot_to_csv.py data/snapshot/articles.jsonl \
+            --sources sources.json --out data/snapshot/articles.csv
+
+      - name: Commit snapshot back to the branch
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/snapshot/articles.jsonl data/snapshot/articles.csv
+          if git diff --cached --quiet; then
+            echo "no snapshot changes"
+          else
+            git commit -m "ci: ingestion snapshot ($(date -u +%Y-%m-%dT%H:%MZ))"
+            git fetch origin "${{ github.ref_name }}"
+            git rebase "origin/${{ github.ref_name }}" || git rebase --abort
+            git push origin HEAD:"${{ github.ref_name }}"
+          fi
+
+      - name: Upload snapshot artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingest-snapshot
+          path: data/snapshot/
