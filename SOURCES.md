@@ -17,16 +17,19 @@ evidence; everything should get one live smoke-test from an unrestricted network
 | 🔧 Wrong URL in sheet — corrected | 3 | NASA (portal page → `nasa.gov/rss/dyn/breaking_news.rss`), ScienceDaily (portal page → `sciencedaily.com/rss/all.xml`), IGN (dead FeedBurner → `ign.com/rss/v2/articles/feed`) |
 | ❌ Dead | 3 | CNN US + CNN World (`rss.cnn.com` stopped updating years ago), Axios Technology (`api.axios.com` feeds dead since ~2022) |
 
-## Dead sources — replacement options
+## Dead sources — replacements chosen (2026-07-21)
 
-- **CNN (Breaking + World):** CNN no longer maintains public RSS. Options:
-  Google News wrapper (`news.google.com/rss/search?q=site:cnn.com+when:1d`),
-  or swap outlets — ABC News (`abcnews.go.com/abcnews/topstories`),
-  CBS News (`cbsnews.com/latest/rss/main`), Sky News World
-  (`feeds.skynews.com/feeds/rss/world.xml`), DW (`rss.dw.com/rdf/rss-en-world`).
-- **Axios Technology:** only a site-wide feed survives (`axios.com/feeds/feed.rss`).
-  For tech specifically, Ars Technica (`feeds.arstechnica.com/arstechnica/index`)
-  or Wired (`wired.com/feed/rss`) are reliable drop-ins.
+- **CNN US (Breaking News)** → **ABC News Top Stories** (`abcnews.go.com/abcnews/topstories`).
+  CNN's `rss.cnn.com` feeds stopped updating years ago and CNN offers no replacement.
+- **CNN World (World)** → **Sky News World** (`feeds.skynews.com/feeds/rss/world.xml`).
+  Alternative kept in notes: DW (`rss.dw.com/rdf/rss-en-world`).
+- **Axios Technology** → **Ars Technica** (`feeds.arstechnica.com/arstechnica/index`).
+  Axios' `api.axios.com` feeds died ~2022; only a site-wide feed survives.
+
+## App decisions (2026-07-21)
+
+- **Platform:** web app (Next.js/React) with a backend that polls feeds.
+- **Same-story matching:** embeddings clustering over headline + summary.
 
 ## Notes relevant to the "multiple coverage of one story" feature
 
