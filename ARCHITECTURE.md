@@ -97,6 +97,39 @@ them is the *select* stage's job, via embeddings).
   an existing JSONL file.
 - `304 Not Modified` is a success with zero new articles, not an error.
 
+## Feed health — testing all 50 sources, continuously
+
+Feeds rot: they go 404, or worse, keep returning HTTP 200 with stale content
+after the publisher abandons them (how the original CNN and Axios feeds died).
+`pipeline/health.py` + `scripts/health_check.py` catch both. Each source gets a
+verdict:
+
+- **pass** — reachable, has items, newest item is fresh (< `--max-age-hours`)
+- **warn** — reachable with items but stale, or has no dates to judge
+- **fail** — unreachable, errored, or zero items
+- **skip** — API sources (need keys/quota), not checked here
+
+The command prints a worst-first table and exits non-zero on any FAIL
+(`--strict` also fails on WARN), so it gates CI.
+
+```bash
+# Locally, wherever you have internet:
+python scripts/health_check.py                       # table + exit code
+python scripts/health_check.py --json report.json    # machine-readable too
+python scripts/health_check.py --strict              # stale = failure
+```
+
+**Automated "each time":** two GitHub Actions workflows (`.github/workflows/`).
+GitHub's runners have open internet, so that's where the live 50-source test
+runs — the dev sandbox can't reach the feed domains.
+
+- **`feed-health.yml`** — live health check every 6h, on demand, and whenever
+  `sources.json`/`pipeline/**` change. A broken or stale feed turns the run red
+  and uploads a JSON report artifact. (Scheduled runs only fire once the
+  workflow is on the default branch; `workflow_dispatch` and push work on any
+  branch.)
+- **`tests.yml`** — the hermetic fixture tests on every push/PR.
+
 ## Running it
 
 ```bash

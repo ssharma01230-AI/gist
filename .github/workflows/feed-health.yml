@@ -1,0 +1,54 @@
+name: Feed health
+
+# Runs the live feed health check over all 50 sources. GitHub's runners have
+# open internet, so this is where the real "do all 50 still work?" test happens
+# (the dev sandbox can't reach the feed domains).
+on:
+  schedule:
+    - cron: "0 */6 * * *"       # every 6 hours (only fires on the default branch)
+  workflow_dispatch:            # run on demand from the Actions tab
+    inputs:
+      max_age_hours:
+        description: "Newest item older than this (hours) counts as stale/WARN"
+        default: "96"
+      strict:
+        description: "Fail the run on stale (WARN) feeds too, not just dead ones"
+        type: boolean
+        default: false
+  push:
+    branches: ["**"]
+    paths:                      # re-check whenever the sources or fetch code change
+      - "sources.json"
+      - "pipeline/**"
+      - "scripts/health_check.py"
+      - ".github/workflows/feed-health.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Run feed health check (live)
+        run: |
+          python scripts/health_check.py \
+            --json health-report.json \
+            --max-age-hours "${{ github.event.inputs.max_age_hours || '96' }}" \
+            ${{ (github.event.inputs.strict == 'true') && '--strict' || '' }}
+
+      - name: Upload health report
+        if: always()            # keep the report even when the check fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: feed-health-report
+          path: health-report.json
