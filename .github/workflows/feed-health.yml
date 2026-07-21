@@ -52,3 +52,19 @@ jobs:
         with:
           name: feed-health-report
           path: health-report.json
+
+      - name: Print per-source report (compact, for logs)
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          d = json.load(open("health-report.json"))
+          print("REPORT_START")
+          for s in d["sources"]:
+              age = "" if s["newest_age_hours"] is None else s["newest_age_hours"]
+              print("\t".join(str(x) for x in [
+                  s["source_id"], s["topic"], s["http_status"],
+                  s["item_count"], age, s["newest_published"], s["verdict"]]))
+          print("SUMMARY " + json.dumps(d["summary"]))
+          print("REPORT_END")
+          PY
