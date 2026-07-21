@@ -38,13 +38,17 @@ found **44 pass, 4 fail, 2 skip**. Acted on as follows:
 
 - **Genuinely dead → replaced:** NYT Sports (HTTP 200 but empty — desk closed 2023)
   → **Yahoo Sports**; Sports Illustrated (HTTP 404) → **CBS Sports**.
-- **Cloud-IP blocked, not dead → now WARN not FAIL:** NASA (429 rate-limit) and
-  ESPN (202 bot-challenge) fail from GitHub's shared runner IPs but should work
-  from a normal ingestion host. The check now classifies these transient statuses
-  (403/408/429/5xx, and non-200 2xx with an empty body) as WARN, so a throttled
-  cloud IP no longer red-lines the whole pipeline while a truly dead feed still does.
-  Re-verify both from your production host; swap only if they persistently fail there.
-- **Skipped:** Alpha Vantage, MarketAux (API sources — need keys, not health-checked).
+- **Cloud-IP blocked → replaced (2026-07-21, "50/50" decision):** NASA (429
+  rate-limit) and ESPN (202 bot-challenge) fail from shared cloud/CI IPs even
+  though the feeds work from normal hosts. To make every source testable and
+  passing from CI: NASA → **NPR Science**, ESPN → **The Guardian (Sport)**.
+  Both originals can be re-added later if ingestion runs from a dedicated IP.
+- **Untestable APIs → replaced (same decision):** Alpha Vantage and MarketAux
+  needed keys and had free tiers too small to poll anyway. Alpha Vantage →
+  **MarketWatch** (official Dow Jones RSS), MarketAux → **Yahoo Finance**.
+- The manifest is now **50 RSS feeds, all live-testable — target: 50/50 pass.**
+  The WARN classification for transient statuses (403/408/429/5xx, empty-body
+  2xx) remains in the checker for one-off network blips.
 
 ## Notes relevant to the "multiple coverage of one story" feature
 
