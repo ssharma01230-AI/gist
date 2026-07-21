@@ -1,0 +1,78 @@
+{
+  "$comment": "Verified news source manifest. status: ok = confirmed usable | ok_caution = usable with caveats (see notes) | url_corrected = original spreadsheet URL was a portal/legacy URL, corrected here | broken = feed is dead, replacement suggested in notes",
+  "verified_at": "2026-07-21",
+  "verification_method": "Web research (RSS directories, official feed pages, outlet announcements). Live HTTP checks were blocked by the sandbox network egress policy - re-verify with a live fetch once network access to these domains is available.",
+  "topics": [
+    "politics",
+    "breaking-news",
+    "finance",
+    "world",
+    "sports",
+    "entertainment",
+    "technology",
+    "science",
+    "culture-arts",
+    "gaming-esports"
+  ],
+  "sources": [
+    { "id": "npr-politics", "topic": "politics", "name": "NPR Politics", "type": "rss", "url": "https://feeds.npr.org/1014/rss.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "the-hill", "topic": "politics", "name": "The Hill", "type": "rss", "url": "https://thehill.com/homenews/feed/", "status": "ok", "notes": "Free, no key. WordPress feed; send a normal browser User-Agent to avoid bot blocks. More section feeds at thehill.com/resources/rss-feeds/." },
+    { "id": "politico", "topic": "politics", "name": "Politico", "type": "rss", "url": "https://rss.politico.com/politics-news.xml", "status": "ok", "notes": "Free, no key. Other section feeds available (congress, economy, healthcare)." },
+    { "id": "bbc-politics", "topic": "politics", "name": "BBC Politics", "type": "rss", "url": "https://feeds.bbci.co.uk/news/politics/rss.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "guardian-politics", "topic": "politics", "name": "The Guardian (Politics)", "type": "rss+api", "url": "https://www.theguardian.com/politics/rss", "status": "ok", "notes": "RSS free/no key. Guardian Open Platform API (open-platform.theguardian.com) is free with a registered key and returns full article text - the best upgrade path of any source here." },
+
+    { "id": "bbc-top", "topic": "breaking-news", "name": "BBC News (Top Stories)", "type": "rss", "url": "https://feeds.bbci.co.uk/news/rss.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "cnn-us", "topic": "breaking-news", "name": "CNN (US)", "type": "rss", "url": "http://rss.cnn.com/rss/edition_us.rss", "status": "broken", "notes": "CNN's rss.cnn.com feeds are dead/stale (stopped updating years ago; confirmed via multiple reader-community reports). Replacement options: Google News wrapper https://news.google.com/rss/search?q=site:cnn.com+when:1d, or swap outlet (ABC News: https://abcnews.go.com/abcnews/topstories, CBS News: https://www.cbsnews.com/latest/rss/main)." },
+    { "id": "npr-top", "topic": "breaking-news", "name": "NPR (Top Stories)", "type": "rss", "url": "https://feeds.npr.org/1001/rss.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "aljazeera", "topic": "breaking-news", "name": "Al Jazeera", "type": "rss", "url": "https://www.aljazeera.com/xml/rss/all.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "google-news-wrapper", "topic": "breaking-news", "name": "Google News (wrapper)", "type": "rss", "url": "https://news.google.com/rss/search?q={query}", "status": "ok_caution", "notes": "Works, no key. Caveats: unofficial and format can change; article links redirect through news.google.com (resolve redirects to recover the original URL for cross-source matching); rate-limit politely and cache. Useful for outlets without feeds (Reuters, AP, CNN)." },
+
+    { "id": "bloomberg-markets", "topic": "finance", "name": "Bloomberg Markets", "type": "rss", "url": "https://feeds.bloomberg.com/markets/news.rss", "status": "ok", "notes": "Free, no key; confirmed live. Sibling feeds: /politics/, /technology/, /economics/, /wealth/, /industries/ + news.rss. Headline + summary only." },
+    { "id": "forbes-business", "topic": "finance", "name": "Forbes Business", "type": "rss", "url": "https://www.forbes.com/business/feed/", "status": "ok", "notes": "Free, no key." },
+    { "id": "coindesk", "topic": "finance", "name": "CoinDesk (Crypto)", "type": "rss", "url": "https://www.coindesk.com/arc/outboundfeeds/rss/", "status": "ok", "notes": "Free, no key. Category filter via ?category= param." },
+    { "id": "alphavantage", "topic": "finance", "name": "Alpha Vantage", "type": "api", "url": "https://www.alphavantage.co/query?function=NEWS_SENTIMENT", "status": "ok_caution", "notes": "Free key required. 25 requests/DAY on free tier - too low to poll as a primary source. Treat as supplemental (ticker-specific sentiment) or drop." },
+    { "id": "marketaux", "topic": "finance", "name": "MarketAux", "type": "api", "url": "https://api.marketaux.com/v1/news/all", "status": "ok_caution", "notes": "Free key required. Free tier is ~100 requests/day and only 3 articles per request - marginal as a primary source." },
+
+    { "id": "bbc-world", "topic": "world", "name": "BBC World", "type": "rss", "url": "https://feeds.bbci.co.uk/news/world/rss.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "aljazeera-world", "topic": "world", "name": "Al Jazeera", "type": "rss", "url": "https://www.aljazeera.com/xml/rss/all.xml", "status": "ok", "notes": "Same feed as breaking-news entry; fetch once, tag both topics." },
+    { "id": "nyt-world", "topic": "world", "name": "NYT World", "type": "rss", "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "status": "ok", "notes": "Free, no key. Metadata + snippet only; NYT terms require linking back to nytimes.com." },
+    { "id": "npr-world", "topic": "world", "name": "NPR World", "type": "rss", "url": "https://feeds.npr.org/1004/rss.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "cnn-world", "topic": "world", "name": "CNN World", "type": "rss", "url": "http://rss.cnn.com/rss/edition_world.rss", "status": "broken", "notes": "Same dead rss.cnn.com infrastructure as CNN US. Replacement options: Google News wrapper q=site:cnn.com+world, or swap outlet (Sky News World: https://feeds.skynews.com/feeds/rss/world.xml, DW: https://rss.dw.com/rdf/rss-en-world)." },
+
+    { "id": "espn", "topic": "sports", "name": "ESPN", "type": "rss", "url": "https://www.espn.com/espn/rss/news", "status": "ok", "notes": "Free, no key. Per-sport feeds also exist (e.g. /espn/rss/nfl/news)." },
+    { "id": "bbc-sport", "topic": "sports", "name": "BBC Sport", "type": "rss", "url": "https://feeds.bbci.co.uk/sport/rss.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "sky-sports", "topic": "sports", "name": "Sky Sports", "type": "rss", "url": "https://www.skysports.com/rss/12040", "status": "ok", "notes": "Free, no key; confirmed live (12040 = main news feed)." },
+    { "id": "sports-illustrated", "topic": "sports", "name": "Sports Illustrated", "type": "rss", "url": "https://www.si.com/rss/si_topstories.rss", "status": "ok", "notes": "Free, no key; still listed in 2025-26 feed directories." },
+    { "id": "nyt-sports", "topic": "sports", "name": "NYT Sports", "type": "rss", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml", "status": "ok_caution", "notes": "Feed still exists, but NYT closed its sports desk in July 2023 (coverage moved to The Athletic), so volume/freshness is uncertain. Consider swapping for Yahoo Sports: https://sports.yahoo.com/rss/." },
+
+    { "id": "variety", "topic": "entertainment", "name": "Variety", "type": "rss", "url": "https://variety.com/feed/", "status": "ok", "notes": "Free, no key." },
+    { "id": "thr", "topic": "entertainment", "name": "The Hollywood Reporter", "type": "rss", "url": "https://www.hollywoodreporter.com/feed/", "status": "ok", "notes": "Free, no key." },
+    { "id": "rollingstone-tv", "topic": "entertainment", "name": "Rolling Stone (TV/Movies)", "type": "rss", "url": "https://www.rollingstone.com/tv-movies/feed/", "status": "ok", "notes": "Free, no key." },
+    { "id": "wapo-entertainment", "topic": "entertainment", "name": "Washington Post Entertainment", "type": "rss", "url": "https://feeds.washingtonpost.com/rss/entertainment", "status": "ok", "notes": "Free, no key. WaPo republished its official RSS directory in May 2026 - feeds are actively supported." },
+    { "id": "bbc-ent-arts", "topic": "entertainment", "name": "BBC Entertainment & Arts", "type": "rss", "url": "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "status": "ok", "notes": "Free, no key." },
+
+    { "id": "techcrunch", "topic": "technology", "name": "TechCrunch", "type": "rss", "url": "https://techcrunch.com/feed/", "status": "ok", "notes": "Free, no key." },
+    { "id": "theverge", "topic": "technology", "name": "The Verge", "type": "rss", "url": "https://www.theverge.com/rss/index.xml", "status": "ok", "notes": "Free, no key. Full-text Atom feed." },
+    { "id": "bbc-tech", "topic": "technology", "name": "BBC Technology", "type": "rss", "url": "https://feeds.bbci.co.uk/news/technology/rss.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "axios-tech", "topic": "technology", "name": "Axios (Technology)", "type": "rss", "url": "https://api.axios.com/feed/technology", "status": "broken", "notes": "api.axios.com feeds died around 2022 (403). Axios' current feed is site-wide only: https://www.axios.com/feeds/feed.rss (no per-topic feed confirmed). Alternatives: Ars Technica https://feeds.arstechnica.com/arstechnica/index or Wired https://www.wired.com/feed/rss." },
+    { "id": "wapo-tech", "topic": "technology", "name": "Washington Post (Business/Tech)", "type": "rss", "url": "https://feeds.washingtonpost.com/rss/business/technology", "status": "ok", "notes": "Free, no key." },
+
+    { "id": "sciam", "topic": "science", "name": "Scientific American", "type": "rss", "url": "http://rss.sciam.com/ScientificAmerican-Global", "status": "url_corrected", "notes": "Spreadsheet listed the Space-section feed (rss.sciam.com/sciam/space, also live). Corrected to the site-wide 'Global' feed for general science coverage; section feeds remain available." },
+    { "id": "space-com", "topic": "science", "name": "Space.com", "type": "rss", "url": "https://www.space.com/feeds.xml", "status": "ok", "notes": "Free, no key; confirmed as the current all-articles feed. Per-type feeds at space.com/feeds/articletype/." },
+    { "id": "nasa", "topic": "science", "name": "NASA", "type": "rss", "url": "https://www.nasa.gov/rss/dyn/breaking_news.rss", "status": "url_corrected", "notes": "Spreadsheet URL (nasa.gov/rss-feeds) is a portal page, not a feed. Corrected to the NASA breaking-news feed; many other topic feeds under nasa.gov/rss/dyn/." },
+    { "id": "sciencedaily", "topic": "science", "name": "ScienceDaily", "type": "rss", "url": "https://www.sciencedaily.com/rss/all.xml", "status": "url_corrected", "notes": "Spreadsheet URL (newsfeeds.htm) is a portal page, not a feed. Corrected to the all-news feed; section feeds under sciencedaily.com/rss/." },
+    { "id": "nature", "topic": "science", "name": "Nature", "type": "rss", "url": "https://www.nature.com/nature.rss", "status": "ok", "notes": "Free, no key. Main journal feed (papers + news); heavier on research articles than news." },
+
+    { "id": "artnews", "topic": "culture-arts", "name": "ARTnews", "type": "rss", "url": "https://www.artnews.com/feed/", "status": "ok", "notes": "Free, no key." },
+    { "id": "hyperallergic", "topic": "culture-arts", "name": "Hyperallergic", "type": "rss", "url": "https://hyperallergic.com/feed/", "status": "ok", "notes": "Free, no key." },
+    { "id": "bbc-ent-arts-culture", "topic": "culture-arts", "name": "BBC Entertainment & Arts", "type": "rss", "url": "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "status": "ok", "notes": "Same feed as entertainment entry; fetch once, tag both topics." },
+    { "id": "guardian-culture", "topic": "culture-arts", "name": "The Guardian (Culture)", "type": "rss", "url": "https://www.theguardian.com/culture/rss", "status": "ok", "notes": "Free, no key. Open Platform API also covers this section with full text." },
+    { "id": "nyt-arts", "topic": "culture-arts", "name": "NYT Arts", "type": "rss", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Arts.xml", "status": "ok", "notes": "Free, no key. Metadata + snippet only." },
+
+    { "id": "ign", "topic": "gaming-esports", "name": "IGN", "type": "rss", "url": "https://www.ign.com/rss/v2/articles/feed", "status": "url_corrected", "notes": "Spreadsheet listed the legacy FeedBurner URL (feeds.ign.com/ign/all). IGN's current native feed is the v2 articles feed; verify the legacy URL before relying on it (FeedBurner is unmaintained)." },
+    { "id": "polygon", "topic": "gaming-esports", "name": "Polygon", "type": "rss", "url": "https://www.polygon.com/rss/index.xml", "status": "ok", "notes": "Free, no key." },
+    { "id": "kotaku", "topic": "gaming-esports", "name": "Kotaku", "type": "rss", "url": "https://kotaku.com/rss", "status": "ok", "notes": "Free, no key." },
+    { "id": "dexerto", "topic": "gaming-esports", "name": "Dexerto (Esports)", "type": "rss", "url": "https://www.dexerto.com/feed/", "status": "ok", "notes": "Free, no key. WordPress feed; listed in current esports feed directories. Per-game feeds also exist (e.g. /esports/feed/)." },
+    { "id": "dotesports", "topic": "gaming-esports", "name": "Dot Esports", "type": "rss", "url": "https://dotesports.com/feed", "status": "ok", "notes": "Free, no key. WordPress feed; listed in current esports feed directories." }
+  ]
+}
