@@ -13,8 +13,12 @@ from typing import Mapping, Protocol
 
 from .models import FetchResult
 
+# A browser-shaped UA. Several publishers (NASA, ESPN, The Hill…) soft-block
+# non-browser agents with 202/403/429 and an empty body, even for public feeds.
+# Sending a normal browser UA is standard practice for RSS readers.
 DEFAULT_UA = (
-    "GistNewsBot/0.1 (+https://github.com/ssharma01230-ai/gist; RSS aggregator)"
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 )
 
 
