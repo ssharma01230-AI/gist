@@ -6,7 +6,7 @@ from pipeline.fetch import FixtureFetcher
 from pipeline.health import (
     FAIL, PASS, SKIP, WARN, check_sources, overall_ok, render_table, summarize,
 )
-from pipeline.models import SourceConfig
+from pipeline.models import FetchResult, SourceConfig
 
 FIX = Path(__file__).parent / "fixtures"
 
@@ -40,14 +40,38 @@ def test_reachable_but_stale_source_warns():
     assert h.http_status == 200
 
 
-def test_unreachable_source_fails():
+def test_transport_error_is_soft_warn_not_fail():
+    # A timeout/reset is transient (esp. from a shared CI IP), so it warns, not fails.
     fetcher = FixtureFetcher(errors={"space-com": "ConnectTimeout: timed out"})
     h = check_sources([_rss()], fetcher, now=JUST_AFTER, max_workers=1)[0]
+    assert h.verdict == WARN
+    assert "transient" in h.error and "timed out" in h.error
+
+
+def test_rate_limited_source_is_soft_warn():
+    # NASA's live failure mode: 429 from a cloud IP. Not dead -> WARN, not FAIL.
+    fetcher = FixtureFetcher(results={"space-com": FetchResult("space-com", "u", status_code=429, error="HTTP 429")})
+    h = check_sources([_rss()], fetcher, now=JUST_AFTER, max_workers=1)[0]
+    assert h.verdict == WARN
+    assert "429" in h.error
+
+
+def test_bot_challenge_202_empty_is_soft_warn():
+    # ESPN's live failure mode: 202 with a non-feed body -> transient, not dead.
+    fetcher = FixtureFetcher(results={"space-com": FetchResult("space-com", "u", status_code=202, body=b"<html>challenge</html>")})
+    h = check_sources([_rss()], fetcher, now=JUST_AFTER, max_workers=1)[0]
+    assert h.verdict == WARN
+    assert "bot challenge" in h.error
+
+
+def test_dead_feed_404_hard_fails():
+    fetcher = FixtureFetcher(results={"space-com": FetchResult("space-com", "u", status_code=404, error="HTTP 404")})
+    h = check_sources([_rss()], fetcher, now=JUST_AFTER, max_workers=1)[0]
     assert h.verdict == FAIL
-    assert "timed out" in h.error
 
 
-def test_empty_or_malformed_feed_fails():
+def test_empty_200_feed_hard_fails():
+    # 200 with zero items = genuinely empty (the NYT Sports failure mode).
     fetcher = FixtureFetcher(by_source={"space-com": (FIX / "malformed.xml").read_bytes()})
     h = check_sources([_rss()], fetcher, now=JUST_AFTER, max_workers=1)[0]
     assert h.verdict == FAIL
@@ -65,10 +89,14 @@ def test_overall_ok_gating():
     assert overall_ok(healths, strict=False) is True    # warn alone doesn't fail
     assert overall_ok(healths, strict=True) is False     # strict fails on stale
 
-    failing = check_sources(
-        [_rss()], FixtureFetcher(errors={"space-com": "boom"}), now=JUST_AFTER, max_workers=1
-    )
-    assert overall_ok(failing, strict=False) is False    # a FAIL always fails
+    dead = FixtureFetcher(results={"space-com": FetchResult("space-com", "u", status_code=404, error="HTTP 404")})
+    failing = check_sources([_rss()], dead, now=JUST_AFTER, max_workers=1)  # hard FAIL (404)
+    assert overall_ok(failing, strict=False) is False    # a hard FAIL always fails
+
+    soft = FixtureFetcher(results={"space-com": FetchResult("space-com", "u", status_code=429, error="HTTP 429")})
+    warned = check_sources([_rss()], soft, now=JUST_AFTER, max_workers=1)  # transient WARN
+    assert overall_ok(warned, strict=False) is True      # transient warns don't fail CI
+    assert overall_ok(warned, strict=True) is False       # ...unless --strict
 
 
 def test_summary_and_table_render():

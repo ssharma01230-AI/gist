@@ -31,6 +31,21 @@ evidence; everything should get one live smoke-test from an unrestricted network
 - **Platform:** web app (Next.js/React) with a backend that polls feeds.
 - **Same-story matching:** embeddings clustering over headline + summary.
 
+## Live health-check findings (2026-07-21, GitHub Actions run)
+
+Running the health check live over all 50 sources from CI (see `feed-health.yml`)
+found **44 pass, 4 fail, 2 skip**. Acted on as follows:
+
+- **Genuinely dead → replaced:** NYT Sports (HTTP 200 but empty — desk closed 2023)
+  → **Yahoo Sports**; Sports Illustrated (HTTP 404) → **CBS Sports**.
+- **Cloud-IP blocked, not dead → now WARN not FAIL:** NASA (429 rate-limit) and
+  ESPN (202 bot-challenge) fail from GitHub's shared runner IPs but should work
+  from a normal ingestion host. The check now classifies these transient statuses
+  (403/408/429/5xx, and non-200 2xx with an empty body) as WARN, so a throttled
+  cloud IP no longer red-lines the whole pipeline while a truly dead feed still does.
+  Re-verify both from your production host; swap only if they persistently fail there.
+- **Skipped:** Alpha Vantage, MarketAux (API sources — need keys, not health-checked).
+
 ## Notes relevant to the "multiple coverage of one story" feature
 
 - Feeds deliver **headline + summary + link + timestamp** (The Verge and Guardian API give

@@ -25,6 +25,13 @@ from .parse import parse_feed
 PASS, WARN, FAIL, SKIP = "pass", "warn", "fail", "skip"
 DEFAULT_MAX_AGE_HOURS = 96.0
 
+# Statuses that mean "try again later", not "this feed is dead". A shared cloud
+# IP (like a CI runner) routinely trips these even when the feed is perfectly
+# healthy from a normal host — NASA 429-rate-limits them, some CDNs answer bot
+# traffic with 403/202. These become WARN (surfaced, not fatal); genuinely dead
+# feeds (404/410, or 200 with an empty/unparseable body) stay FAIL.
+SOFT_HTTP = {403, 408, 425, 429, 500, 502, 503, 504}
+
 
 @dataclass
 class SourceHealth:
@@ -60,12 +67,22 @@ def check_source(
     try:
         result = fetcher.fetch(source.id, source.url)  # no conditional GET: we want a live pull
     except Exception as exc:
-        return SourceHealth(source.id, source.name, source.topic, source.url, FAIL,
-                            error=f"fetch raised {type(exc).__name__}: {exc}")
+        return SourceHealth(source.id, source.name, source.topic, source.url, WARN,
+                            error=f"transient: fetch raised {type(exc).__name__}: {exc}")
+
+    if result.not_modified:
+        return SourceHealth(source.id, source.name, source.topic, source.url, PASS,
+                            http_status=304, error="not modified since last fetch")
 
     if not result.ok:
-        return SourceHealth(source.id, source.name, source.topic, source.url, FAIL,
-                            http_status=result.status_code, error=result.error or "fetch failed")
+        # status 0 = no HTTP response at all (timeout/connection reset) -> transient.
+        soft = result.status_code == 0 or result.status_code in SOFT_HTTP
+        return SourceHealth(
+            source.id, source.name, source.topic, source.url,
+            WARN if soft else FAIL,
+            http_status=result.status_code,
+            error=("transient: " if soft else "") + (result.error or "fetch failed"),
+        )
 
     try:
         articles = parse_feed(source, result.body, fetched_at=now.isoformat(timespec="seconds"))
@@ -74,6 +91,12 @@ def check_source(
                             http_status=result.status_code, error=f"parse failed: {type(exc).__name__}: {exc}")
 
     if not articles:
+        # 200 + no items = a genuinely empty feed (hard). A non-200 2xx (202/203/206)
+        # with no items is almost always a bot-challenge body, not a dead feed (soft).
+        if result.status_code != 200:
+            return SourceHealth(source.id, source.name, source.topic, source.url, WARN,
+                                http_status=result.status_code,
+                                error=f"transient: HTTP {result.status_code} with no items (bot challenge?)")
         return SourceHealth(source.id, source.name, source.topic, source.url, FAIL,
                             http_status=result.status_code, error="feed returned zero items")
 

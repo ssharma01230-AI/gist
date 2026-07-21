@@ -98,13 +98,18 @@ class FixtureFetcher:
         by_source: Mapping[str, bytes] | None = None,
         fixtures_dir: str | Path | None = None,
         errors: Mapping[str, str] | None = None,
+        results: Mapping[str, FetchResult] | None = None,
     ) -> None:
         self.by_url = dict(by_url or {})
         self.by_source = dict(by_source or {})
         self.fixtures_dir = Path(fixtures_dir) if fixtures_dir else None
         self.errors = dict(errors or {})
+        # Pre-baked FetchResults, for exercising specific HTTP outcomes (429, 404, 202…).
+        self.results = dict(results or {})
 
     def fetch(self, source_id: str, url: str, *, etag: str = "", last_modified: str = "") -> FetchResult:
+        if source_id in self.results:
+            return self.results[source_id]
         if source_id in self.errors:
             return FetchResult(source_id=source_id, url=url, error=self.errors[source_id])
         body = self.by_source.get(source_id) or self.by_url.get(url)
