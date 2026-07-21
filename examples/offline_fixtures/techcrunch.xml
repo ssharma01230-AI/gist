@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Example Tech</title>
+  <link href="https://example-tech.test/"/>
+  <updated>2026-07-21T08:00:00Z</updated>
+  <id>urn:example-tech:feed</id>
+  <entry>
+    <title>Chipmaker unveils 2nm process ahead of schedule</title>
+    <link href="https://example-tech.test/2nm"/>
+    <id>urn:example-tech:2nm-0001</id>
+    <updated>2026-07-21T07:30:00Z</updated>
+    <published>2026-07-21T07:15:00Z</published>
+    <author><name>T. Writer</name></author>
+    <summary type="html">&lt;p&gt;Volume production is slated for early next year.&lt;/p&gt;</summary>
+    <category term="Semiconductors"/>
+  </entry>
+  <entry>
+    <title>Open-source model matches proprietary rivals on reasoning benchmark</title>
+    <link href="https://example-tech.test/oss-model"/>
+    <id>urn:example-tech:oss-0002</id>
+    <published>2026-07-20T19:45:00Z</published>
+    <content type="html">&lt;p&gt;The release includes weights and a permissive licence. &lt;img src="https://img.example-tech.test/oss.png"/&gt;&lt;/p&gt;</content>
+  </entry>
+</feed>

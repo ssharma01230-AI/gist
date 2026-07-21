@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Pipeline runtime output (generated, not source)
+/data/
+*.jsonl
+!examples/**/*.jsonl
+
+# Feed state (conditional-GET validators)
+*.state.json
+feed_state.json
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

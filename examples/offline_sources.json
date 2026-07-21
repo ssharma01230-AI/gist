@@ -1,0 +1,9 @@
+{
+  "$comment": "Tiny offline manifest for the ingestion smoke test. Source ids match the fixture filenames in examples/offline_fixtures/ so FixtureFetcher can resolve them with no network.",
+  "verified_at": "2026-07-21",
+  "topics": ["science", "technology"],
+  "sources": [
+    { "id": "space-com", "topic": "science", "name": "Space.com (fixture)", "type": "rss", "url": "https://www.space.com/feeds.xml", "status": "ok", "notes": "offline fixture" },
+    { "id": "techcrunch", "topic": "technology", "name": "TechCrunch (fixture)", "type": "rss", "url": "https://techcrunch.com/feed/", "status": "ok", "notes": "offline fixture" }
+  ]
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Example Science News</title>
+    <link>https://example-science.test/</link>
+    <description>Science headlines</description>
+    <item>
+      <title>New telescope detects potential signs of life on exoplanet K2-18b</title>
+      <link>https://example-science.test/k2-18b</link>
+      <guid isPermaLink="false">example-science:k2-18b-0001</guid>
+      <description>&lt;p&gt;Scientists detected molecules in the planet&#8217;s atmosphere that on Earth are linked to biological processes. &lt;img src="https://img.example-science.test/k2-18b.jpg"/&gt;&lt;/p&gt;</description>
+      <pubDate>Mon, 20 Jul 2026 09:15:00 GMT</pubDate>
+      <dc:creator>A. Astronomer</dc:creator>
+      <category>Astronomy</category>
+      <media:content url="https://media.example-science.test/k2-18b-lead.jpg" type="image/jpeg" medium="image"/>
+    </item>
+    <item>
+      <title>Fusion reactor sustains plasma for record five minutes</title>
+      <link>https://example-science.test/fusion-record</link>
+      <guid isPermaLink="false">example-science:fusion-0002</guid>
+      <description>The tokamak milestone edges the field closer to net-energy gain.</description>
+      <pubDate>Sun, 19 Jul 2026 22:40:00 GMT</pubDate>
+      <category>Energy</category>
+    </item>
+    <item>
+      <title>Ancient riverbed mapped beneath Martian surface</title>
+      <link>https://example-science.test/mars-riverbed</link>
+      <guid isPermaLink="false">example-science:mars-0003</guid>
+      <description>Radar data reveals a buried channel network hundreds of kilometres long.</description>
+      <pubDate>Sat, 18 Jul 2026 14:05:00 GMT</pubDate>
+      <enclosure url="https://media.example-science.test/mars.png" type="image/png" length="10240"/>
+    </item>
+  </channel>
+</rss>
